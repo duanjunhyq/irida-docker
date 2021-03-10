@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  irida-db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    image: irida-database
+    container_name: irida-db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: test_pass
+      MYSQL_DATABASE: irida
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    ports:
+      - "3306:3306"
+    volumes:
+      - /opt/irida/irida_db:/var/lib/mysql
+  irida:
+    build:
+      context: ./irida
+      dockerfile: Dockerfile
+    image: irida_web:21.01
+    ports:
+      - "81:8080"
+    volumes:
+      - webapps:/usr/local/tomcat/webapps
+      - /opt/irida/logs:/usr/local/tomcat/logs
+      - /opt/irida/data:/opt/irida/data
+      - /etc/irida:/etc/irida
+    depends_on:
+      - irida-db
+
+volumes:
+  webapps:
